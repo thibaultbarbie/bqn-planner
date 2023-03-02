@@ -1,6 +1,6 @@
 # Uniform sampler
 res←100
-Sample ← {res ÷˜ 2 •rand.Deal res+𝕩}
+Sample ← 2⊸•rand.Deal⊸÷∘res
 
 # Collision checker
 radius_squared ← 0.2

@@ -64,6 +64,5 @@ RRTConnect ← {
 iter‿solved‿path_sol ← RRTConnect⍟2000 0‿0‿0
 •Show  Col¨ path_sol
 
-J ← ∾1↓·⥊<⊸(≍˘)
-#•Show (<",") J¨ •Repr¨¨ path_sol
-"a.test" •file.Lines (<",") J¨ •Repr¨¨ path_sol
+J ← ∾1↓·⥊<⊸(≍˘) #Csv util from bqn-crate
+"solution.csv" •file.Lines (<",") J¨ •Repr¨¨ path_sol

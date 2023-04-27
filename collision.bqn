@@ -1,8 +1,11 @@
+# Compute if a segment is in collision with a circle.
+# First we compute if the segment endpoints are in the circle (function F)
+# If F is false we compute the distance from the circle to the segment
+# This function can handle multiple segments and multiple circles
 # 𝕩≢2‿n‿2    𝕨≢⟨2‿k, k⟩
 ColSegmentsCircles← {
  c‿r ← 𝕨 ⋄ r_sq ← ×˜r 
  F ← {∨´∘⥊˘ (r_sq⊸≥)⎉1 +˝×˜ 𝕩 -⌜˘ c}
-
  G ← { cacb ← 𝕩 -⌜˘ c ⋄ ca ← ⊏⎉2 cacb ⋄ ab ← -˝⎉1 𝕩 
           n ← (-⌾⊏)∘⌽ ab
           d_sq ← (×˜ +˝ n × ca) ÷ +˝×˜ ab
@@ -36,3 +39,4 @@ Benchmark ← {
 }
 
 benchmark_res ← 5‿50 Benchmark⌜  10‿1000
+•Show benchmark_res

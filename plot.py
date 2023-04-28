@@ -12,14 +12,19 @@ with open('solution.csv', newline='') as csvfile:
         data.append(d)
 
 data_numpy = np.array(data)
-print(data_numpy)
 plt.plot(data_numpy[:,0], data_numpy[:,1], color = "green")
 
-
-circle = plt.Circle((0.5, 0.5), 0.173, color=np.array([97, 76, 117])/255)
 ax = plt.gca()
 
+circle = plt.Circle((0.5, 0.5), 0.173, color=np.array([97, 76, 117])/255)
 ax.add_patch(circle)
+
+start_circle = plt.Circle((data_numpy[0,0], data_numpy[0,1]), 0.01, color="blue")
+ax.add_patch(start_circle)
+
+goal_circle = plt.Circle((data_numpy[-1,0], data_numpy[-1,1]), 0.01, color="red")
+ax.add_patch(goal_circle)
+
 plt.xlim([0, 1])
 plt.ylim([0, 1])
 

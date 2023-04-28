@@ -1,3 +1,5 @@
+⟨ ColSegmentsCircles, FK ⟩ ⇐ 
+
 # Compute if a segment is in collision with a circle.
 # First we compute if the segment endpoints are in the circle (function F)
 # If F is false we compute the distance from the circle to the segment
@@ -8,35 +10,16 @@ ColSegmentsCircles← {
  F ← {∨´∘⥊˘ (r_sq⊸≥)⎉1 +˝×˜ 𝕩 -⌜˘ c}
  G ← { cacb ← 𝕩 -⌜˘ c ⋄ ca ← ⊏⎉2 cacb ⋄ ab ← -˝⎉1 𝕩 
           n ← (-⌾⊏)∘⌽ ab
-          d_sq ← (×˜ +˝ n × ca) ÷ +˝×˜ ab
-          ∨˝˘(0 ≥ +˝ ca × 1⊏⎉2 cacb) ∧ r_sq⊸≥⎉1 d_sq}
+       d_sq ← (×˜ +˝ n × ca) ÷ +˝×˜ ab
+       ∨˝˘(0 ≥ +˝ ca × 1⊏⎉2 cacb) ∧ r_sq⊸≥⎉1 d_sq}
  m ← ¬F 𝕩 ⋄ col ← (G m /⎉2 𝕩)⌾(m⊸/) (1⊑≢𝕩) ⥊ 1
 }
 
-# ---- Tests ----
-
-points  ← [[⟨-10, -8⟩, ⟨-10,  2⟩, ⟨-4, 4⟩, ⟨-2,  2⟩, ⟨-6, 10⟩, ⟨-6, -4⟩,
-            ⟨ -4,  4⟩, ⟨ -2, -2⟩, ⟨ 0, 4⟩, ⟨ 0, 12⟩, ⟨ 6, 12⟩, ⟨-8, 10⟩],
-	   [⟨4, -6⟩, ⟨-2, -2⟩, ⟨-10, -6⟩, ⟨0, -8⟩,⟨ 2, -2⟩,⟨  8,  6⟩,
-            ⟨4,  2⟩, ⟨ 2,  6⟩, ⟨  4,  8⟩, ⟨8,  8⟩,⟨10, -2⟩,⟨-10, 10⟩ ]]
-	   
-circle_centers ← [⟨-4,  6, 8,   2,  -6⟩,
-                  ⟨-4, -4, 4,   2,   6⟩]
-radius         ← ⟨  4,  2, 4, 1.2, 1.2⟩
-
-expected ← 0‿1‿0‿1‿0‿0‿1‿0‿0‿1‿1‿1
-test_result ← ∧´ expected = ⟨(circle_centers), radius⟩ ColSegmentsCircles points
-
-# ---- Benchmark ----
-
-Benchmark ← {
-  n ← 𝕩 ⋄ k ← 𝕨
-  points  ↩ 10 × 2‿n‿2 •rand.Range 0
-  circle_centers ↩ 10 × 2‿k •rand.Range 0
-  radius ↩ 10 × k •rand.Range 0
-   
-  1000 ⟨circle_centers, radius⟩⊸ColSegmentsCircles•_timed points
+# Output should be 2‿n‿2 (x/y ‿ number of q × =l ‿ A/B)
+FK ← {
+ l‿q ←𝕩 ⋄ a ← +`˘ q
+ x ← ∾˝ (2↕(0˙∾+`))˘ l ×˘ •math.Cos a
+ y ← ∾˝ (2↕(0˙∾+`))˘ l ×˘ •math.Sin a
+ x≍y
 }
 
-benchmark_res ← 5‿50 Benchmark⌜  10‿1000
-•Show benchmark_res

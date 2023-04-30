@@ -10,6 +10,7 @@ RRTConnect ← {
  # are talking about, and the list of parent of the tree.
  trees ← ⟨ ⟨⟨0⟩, ⟨0⟩⟩, ⟨⟨1⟩,⟨0⟩⟩ ⟩
  q_list ← ⟨⟨0.01, 0.01, 0.01⟩, ⟨0.85, 0.2, 0⟩⟩
+ d_max ← 0.01
  
  # n LinSample a‿b will gives [a, a+0.001, a+0.002, (n times), b]
  LinSample ← {n←𝕨 ÷˜ ⟜(¯1×-´)𝕩 ⋄ (1⊑𝕩)∾˜ ⍉ (⊑𝕩)+ n× (≠⊑𝕩)‿𝕨 ⥊ (⊢∾⊢)⟜↕ 𝕨}
@@ -25,7 +26,7 @@ RRTConnect ← {
 
  # 𝕩: the node q we extend toward, the index of the tree considered, the maximum distance
  Extend  ← {
-   q‿t‿d_max ← 𝕩 
+   q‿t ← 𝕩 
    p ← ((⊑t⊑trees) NearestNeighbor q) ⋄ q_near ← (p⊑⊑t⊑ trees) ⊑ q_list  
     
    dist ← √ (+´×˜ q - q_near)
@@ -37,38 +38,28 @@ RRTConnect ← {
  }
 
  # 𝕩: the node q we extend toward, the index of the tree considered, the maximum distance
- Connect ← {q‿t‿d_max ← 𝕩 ⋄ a ← Extend q‿(¬t)‿d_max ⋄ 𝕊⍟(¬∨´ a) 𝕩 ⋄ d ← 1⊑a ⋄ d}
+ Connect ← {q‿t ← 𝕩 ⋄ a ← Extend q‿(¬t) ⋄ 𝕊⍟(¬∨´ a) 𝕩 ⋄ d ← 1⊑a ⋄ d}
 
  # 𝕩: the index of the parent, 𝕨: the parent tree considered
  Path ← {𝕩 = 0 ? 𝕩; 𝕩∾ (𝕨𝕊 (𝕩⊑𝕨))}
  
- LocalLoop ← {
-  d_max ← 0.01 ⋄ n‿solved‿path_sol ← 𝕩 ⋄ t ← (2|n) 
+ InnerLoop ← {
+  n‿solved‿path_sol ← 𝕩 ⋄ t ← (2|n) 
   q_rand ← 3 •rand.Range 0
 
   {¬solved ?
-    solved ↩ { ¬⊑(Extend q_rand‿t‿d_max) ? Connect (⊑¯1↑q_list)‿t‿d_max ; 0 }
-
-    {solved ? 
-      a ← (1⊑t⊑trees) Path ⊑¯1↑1⊑t⊑trees ⋄ b ← (1⊑(¬t)⊑trees) Path ⊑¯1↑1⊑(¬t)⊑trees
-
-      ar‿br ← {((1⊑𝕩) Path ¯1⊑1⊑𝕩) ⊏ ⊑𝕩}¨ trees
-
-      path_sol ↩ ((⌽ar) ∾ br)⊏q_list
-    
-      path_sol ↩ {t ? ((⌽b⊏⊑(¬t)⊑trees)∾(a⊏⊑t⊑trees) )⊏q_list ;
-                      ((⌽a⊏⊑t⊑trees)∾(b⊏⊑(¬t)⊑trees) )⊏q_list}
-      ; @
-    }
-
+    solved ↩ { ¬⊑(Extend q_rand‿t) ? Connect (⊑¯1↑q_list)‿t ; 0 }
+    {solved ? a‿b ← {idx‿p: (p Path ¯1⊑p) ⊏ idx}¨ trees ⋄ path_sol ↩ ((⌽a) ∾ b)⊏q_list ; @ }
     (1+n)‿solved‿path_sol;
+    
     n‿solved‿path_sol
   } 
  }
 
- LocalLoop⍟10000 0‿0‿0
+ InnerLoop⍟10000 0‿0‿0
 } 
 
-# iter‿solved‿path_sol ← RRTConnect 0
-# J ← ∾1↓·⥊<⊸(≍˘) #Csv util from bqn-crate
-# "solution.csv" •file.Lines (<",") J¨ •Repr¨¨ path_sol
+iter‿solved‿path_sol ← RRTConnect 0
+•Show iter‿solved
+J ← ∾1↓·⥊<⊸(≍˘) #Csv util from bqn-crate
+"solution.csv" •file.Lines (<",") J¨ •Repr¨¨ path_sol

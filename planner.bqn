@@ -1,16 +1,13 @@
 ⟨ RRTConnect ⟩ ⇐ 
 ⟨ IsValid⟩ ← •Import "collision.bqn"
 
-RRTConnect ← {
- 𝕩 ⋄ s ← 3 •rand.Range 0  ⋄  g ← 3 •rand.Range 0
-
  # ≢trees = [2, 2, size_of_each_tree]
  # trees is composed of start tree and goal tree.
  # A tree is made of two lists: the list of index of q_list to reference which node we
  # are talking about, and the list of parent of the tree.
- trees ← ⟨ ⟨⟨0⟩, ⟨0⟩⟩, ⟨⟨1⟩,⟨0⟩⟩ ⟩
- q_list ← ⟨⟨0.01, 0.01, 0.01⟩, ⟨0.85, 0.2, 0⟩⟩
- d_max ← 0.01
+RRTConnect ← {
+ 𝕩 ⋄ s ← ⟨0.01, 0.01, 0.01⟩  ⋄  g ← ⟨0.85, 0.2, 0⟩
+ trees ← ⟨ ⟨⟨0⟩, ⟨0⟩⟩, ⟨⟨1⟩,⟨0⟩⟩ ⟩ ⋄ q_list ← ⟨s, g⟩ ⋄ d_max ← 0.01
  
  # n LinSample a‿b will gives [a, a+0.001, a+0.002, (n times), b]
  LinSample ← {n←𝕨 ÷˜ ⟜(¯1×-´)𝕩 ⋄ (1⊑𝕩)∾˜ ⍉ (⊑𝕩)+ n× (≠⊑𝕩)‿𝕨 ⥊ (⊢∾⊢)⟜↕ 𝕨}
@@ -22,12 +19,11 @@ RRTConnect ← {
  NearestNeighbor ← {⊑(⊢⊐⌊´) (𝕨⊏q_list) {+´×˜𝕨-𝕩}¨ <𝕩 }
 
  # 𝕩: the node to be added, 𝕨=(t, p): the index of the tree and the index of the parent
- AddNode ← { t‿p←𝕨 ⋄ trees ∾⟜(≠q_list)⌾(⊑(t⊸⊑))↩ ⋄ trees ∾⟜(p)⌾(1⊑(t⊸⊑))↩ ⋄q_list ∾⟜(<𝕩)↩}
+ AddNode ← { t‿p←𝕨 ⋄ trees ∾⟜(≠q_list)⌾(⊑(t⊸⊑))↩ ⋄ trees ∾⟜(p)⌾(1⊑(t⊸⊑))↩ ⋄ q_list ∾⟜(<𝕩)↩}
 
  # 𝕩: the node q we extend toward, the index of the tree considered, the maximum distance
  Extend  ← {
-   q‿t ← 𝕩 
-   p ← ((⊑t⊑trees) NearestNeighbor q) ⋄ q_near ← (p⊑⊑t⊑ trees) ⊑ q_list  
+   q‿t: p ← ((⊑t⊑trees) NearestNeighbor q) ⋄ q_near ← (p⊑⊑t⊑ trees) ⊑ q_list  
     
    dist ← √ (+´×˜ q - q_near)
    q_new ← (d_max≤dist)  ⊑ q‿(q_near + dist÷˜d_max×(q - q_near))
@@ -39,27 +35,21 @@ RRTConnect ← {
 
  # 𝕩: the node q we extend toward, the index of the tree considered, the maximum distance
  Connect ← {q‿t ← 𝕩 ⋄ a ← Extend q‿(¬t) ⋄ 𝕊⍟(¬∨´ a) 𝕩 ⋄ d ← 1⊑a ⋄ d}
-
- # 𝕩: the index of the parent, 𝕨: the parent tree considered
- Path ← {𝕩 = 0 ? 𝕩; 𝕩∾ (𝕨𝕊 (𝕩⊑𝕨))}
  
- InnerLoop ← {
-  n‿solved‿path_sol ← 𝕩 ⋄ t ← (2|n) 
-  q_rand ← 3 •rand.Range 0
-
+ InnerLoop ← { 𝕩 ⋄ t ← (2|n) ⋄ q_rand ← 3 •rand.Range 0
   {¬solved ?
-    solved ↩ { ¬⊑(Extend q_rand‿t) ? Connect (⊑¯1↑q_list)‿t ; 0 }
-    {solved ? a‿b ← {idx‿p: (p Path ¯1⊑p) ⊏ idx}¨ trees ⋄ path_sol ↩ ((⌽a) ∾ b)⊏q_list ; @ }
-    (1+n)‿solved‿path_sol;
-    
-    n‿solved‿path_sol
+    n↩n+1 ⋄ solved ↩ { ¬⊑(Extend q_rand‿t) ? Connect (⊑¯1↑q_list)‿t ; 0 }
+    {solved ? a‿b ← {idx‿p: (p {𝕩=0 ? 𝕩; 𝕩∾ (𝕨𝕊 (𝕩⊑𝕨))} ¯1⊑p) ⊏ idx}¨ trees
+              path_sol ↩ ((⌽a) ∾ b)⊏q_list ;
+	      @ } ;
+    @
   } 
  }
-
- InnerLoop⍟10000 0‿0‿0
+ 
+ n ← 0 ⋄ solved ← 0 ⋄ path_sol ← 0 ⋄ InnerLoop⍟10000 0 ⋄ solved‿n‿path_sol
 } 
 
-iter‿solved‿path_sol ← RRTConnect 0
-•Show iter‿solved
+solved‿iter‿path_sol ← RRTConnect 0
+•Show solved‿iter
 J ← ∾1↓·⥊<⊸(≍˘) #Csv util from bqn-crate
 "solution.csv" •file.Lines (<",") J¨ •Repr¨¨ path_sol

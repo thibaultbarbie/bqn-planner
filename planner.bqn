@@ -1,17 +1,20 @@
+⟨ IsValid⟩ ← •Import "collision.bqn"
+
 # n LinSample a‿b will gives [a, a+0.001, a+0.002, (n times), b]
 LinSample ← {n←𝕨 ÷˜ ⟜(¯1×-´)𝕩 ⋄ (1⊑𝕩)∾˜ ⍉ (⊑𝕩)+ n× (≠⊑𝕩)‿𝕨 ⥊ (⊢∾⊢)⟜↕ 𝕨}
 radius_squared ← 0.03 ⋄ obs ← 0.5‿0.5
 DistSqr ←  {+´2⋆˜𝕨-𝕩}
-Col←{0<radius_squared - obs DistSqr 𝕩}
+#Col←{0<radius_squared - obs DistSqr 𝕩}
+Col ← ¬IsValid 
 # TODO the TransitionCol function should use the resolution parameter (eps)
 TransitionCol ← {∨´ Col˘ (10 LinSample 𝕩)}
 
-s ← 2 •rand.Range 0  ⋄  g ← 2 •rand.Range 0
+s ← 3 •rand.Range 0  ⋄  g ← 3 •rand.Range 0
 
 # ≢trees = [2, 2, size_of_each_tree]
 # trees is composed of start tree and goal tree. A tree is made of two lists: the list of index of q_list to reference which node we are talking about, and the list of parent of the tree.
 trees ← ⟨ ⟨⟨0⟩, ⟨0⟩⟩, ⟨⟨1⟩,⟨0⟩⟩ ⟩
-q_list ← ⟨⟨0.8, 0.1⟩, ⟨0.15, 0.9⟩⟩
+q_list ← ⟨⟨0.01, 0.01, 0.01⟩, ⟨0.85, 0.2, 0⟩⟩
 
 # 𝕩: The node to be compared with, 𝕨: the specific tree (not the parent tree)
 # Output the index of the nearest node to 𝕩 in the tree 𝕨 (example: k not 𝕨[k])
@@ -42,7 +45,7 @@ Path ← {𝕩 = 0 ? 𝕩; 𝕩∾ (𝕨𝕊 (𝕩⊑𝕨))}
 RRTConnect ← {
   d_max ← 0.01 ⋄ n‿solved‿path_sol ← 𝕩 ⋄ t ← (2|n)
   
-  q_rand ← 2 •rand.Range 0
+  q_rand ← 3 •rand.Range 0
 
   {¬solved ?
     solved ↩ { ¬⊑(Extend q_rand‿t‿d_max) ? Connect (⊑¯1↑q_list)‿t‿d_max ; 0 }
@@ -61,8 +64,8 @@ RRTConnect ← {
   
 }
 
-iter‿solved‿path_sol ← RRTConnect⍟2000 0‿0‿0
-•Show  Col¨ path_sol
+iter‿solved‿path_sol ← RRTConnect⍟10000 0‿0‿0
+•Show solved
 
 J ← ∾1↓·⥊<⊸(≍˘) #Csv util from bqn-crate
 "solution.csv" •file.Lines (<",") J¨ •Repr¨¨ path_sol

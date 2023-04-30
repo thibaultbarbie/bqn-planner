@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib import animation
 import csv
 import numpy as np
 
@@ -9,24 +10,48 @@ with open('solution.csv', newline='') as csvfile:
         d = []
         d.append(float(row[0]))
         d.append(float(row[1]))
+        d.append(float(row[2]))
         data.append(d)
 
 data_numpy = np.array(data)
-plt.plot(data_numpy[:,0], data_numpy[:,1], color = "green")
 
-ax = plt.gca()
+l = np.array([0.5, 0.5, 0.5])
+def FK(q):
+    res = np.zeros((2, l.shape[0]+1))
+    q_vec = np.add.accumulate(q)
+    res[0,1:] = np.add.accumulate(l * np.cos(q_vec))
+    res[1,1:] = np.add.accumulate(l * np.sin(q_vec))
+    return res
 
-circle = plt.Circle((0.5, 0.5), 0.173, color=np.array([97, 76, 117])/255)
+fig = plt.figure()
+ax = plt.axes(xlim=(-2, 2), ylim=(-1, 2))
+
+circle = plt.Circle((0, 1), 0.173, color=np.array([97, 76, 117])/255)
 ax.add_patch(circle)
 
-start_circle = plt.Circle((data_numpy[0,0], data_numpy[0,1]), 0.01, color="blue")
-ax.add_patch(start_circle)
+circle2 = plt.Circle((-0.5, 0), 0.173, color=np.array([97, 76, 117])/255)
+ax.add_patch(circle2)
 
-goal_circle = plt.Circle((data_numpy[-1,0], data_numpy[-1,1]), 0.01, color="red")
-ax.add_patch(goal_circle)
+circle3 = plt.Circle((1, 1.1), 0.08, color=np.array([97, 76, 117])/255)
+ax.add_patch(circle3)
 
-plt.xlim([0, 1])
-plt.ylim([0, 1])
+circle4 = plt.Circle((-1, 1), 0.08, color=np.array([97, 76, 117])/255)
+ax.add_patch(circle4)
 
-plt.gca().set_aspect('equal')
+line, = ax.plot([], [])
+
+def init():
+    line.set_data([], [])
+    return line,
+
+def animate(i):
+    p = FK(data_numpy[i]*np.pi)
+    #print(f"{data_numpy[i]}   {p}")
+    line.set_data(p[0,:], p[1,:])
+    return line,
+
+plt.gca().set_aspect("equal")
+anim = animation.FuncAnimation(fig, animate, init_func=init,
+                               frames=data_numpy.shape[0], interval=20, blit=True)
+
 plt.show()

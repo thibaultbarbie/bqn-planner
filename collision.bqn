@@ -1,4 +1,4 @@
-⟨ ColSegmentsCircles, FK ⟩ ⇐ 
+⟨ ColSegmentsCircles, FK, IsValid ⟩ ⇐ 
 
 # Compute if a segment is in collision with a circle.
 # First we compute if the segment endpoints are in the circle (function F)
@@ -23,3 +23,10 @@ FK ← {
  x≍y
 }
 
+IsValid ← {
+  q ← (1‿3)⥊ π×𝕩 ⋄ l ← 1‿3 ⥊⟨0.5,0.5,0.5⟩
+  circle_centers ← 2‿4 ⥊ [⟨0,-0.5, 1, -1⟩, ⟨1,0, 0.9, 1⟩]
+  radius ← ⟨0.173, 0.173, 0.08, 0.08⟩
+  
+  ¬ ∨´(⟨circle_centers, radius⟩⊸ColSegmentsCircles)∘FK l‿q
+}

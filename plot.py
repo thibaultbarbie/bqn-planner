@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from matplotlib import animation
+from matplotlib.animation import FuncAnimation, PillowWriter
 import csv
 import numpy as np
 
@@ -46,12 +46,14 @@ def init():
 
 def animate(i):
     p = FK(data_numpy[i]*np.pi)
-    #print(f"{data_numpy[i]}   {p}")
     line.set_data(p[0,:], p[1,:])
     return line,
 
 plt.gca().set_aspect("equal")
-anim = animation.FuncAnimation(fig, animate, init_func=init,
-                               frames=data_numpy.shape[0], interval=20, blit=True)
-
+ax.get_xaxis().set_ticks([])
+ax.get_yaxis().set_ticks([])
+anim = FuncAnimation(fig, animate, init_func=init, frames=data_numpy.shape[0],
+                     interval=20, blit=True)
+#anim.save("workspace_plan.gif", dpi=100, writer=PillowWriter(fps=25))
 plt.show()
+

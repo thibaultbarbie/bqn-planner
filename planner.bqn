@@ -12,7 +12,7 @@ RRTConnect ← {
  # n LinSample a‿b will gives [a, a+0.001, a+0.002, (n times), b]
  LinSample ← {n←𝕨 ÷˜ ⟜(¯1×-´)𝕩 ⋄ (1⊑𝕩)∾˜ ⍉ (⊑𝕩)+ n× (≠⊑𝕩)‿𝕨 ⥊ (⊢∾⊢)⟜↕ 𝕨}
  # TODO the TransitionCol function should use the resolution parameter (eps)
- Col ← ¬IsValid ⋄ TransitionCol ← {∨´ Col˘ (10 LinSample 𝕩)}
+ TransitionCol ← ∨´∘(¬IsValid˘) 10˙⊸LinSample
 
  # 𝕩: The node to be compared with, 𝕨: the specific tree (not the parent tree)
  # Output the index of the nearest node to 𝕩 in the tree 𝕨 (example: k not 𝕨[k])
@@ -28,13 +28,13 @@ RRTConnect ← {
    dist ← √ (+´×˜ q - q_near)
    q_new ← (d_max≤dist)  ⊑ q‿(q_near + dist÷˜d_max×(q - q_near))
    col ← TransitionCol q_near‿q_new
-    
+   
    { col ? @ ; (t‿p) AddNode q_new}
    col‿(¬ d_max≤dist)
  }
 
- # 𝕩: the node q we extend toward, the index of the tree considered, the maximum distance
- Connect ← {q‿t ← 𝕩 ⋄ a ← Extend q‿(¬t) ⋄ 𝕊⍟(¬∨´ a) 𝕩 ⋄ d ← 1⊑a ⋄ d}
+ # 𝕩: the node q we extend toward, the index of the tree considered
+ Connect ← {q‿t: a ← Extend q‿(¬t) ⋄ 𝕊⍟(¬∨´ a) 𝕩 ⋄ 1⊑a}
  
  InnerLoop ← { 𝕩 ⋄ t ← (2|n) ⋄ q_rand ← 3 •rand.Range 0
   {¬solved ?

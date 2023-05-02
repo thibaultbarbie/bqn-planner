@@ -16,7 +16,7 @@ ColSegmentsCircles← {
 }
 
 # Output should be 2‿n‿2 (x/y ‿ number of q × =l ‿ A/B)
-FK ← {l‿q: T ← {∾˝ (2↕(0˙∾+`))˘ l ×˘ 𝕩} ⋄ (T∘•math.Cos ≍  T∘•math.Sin) +`˘ q}
+FK ← {l‿q: T ← {∾˝ (2↕(0˙∾+`))˘ l ×˘ 𝕩} ⋄ (T∘•math.Cos ≍ T∘•math.Sin) +`˘ q}
 
 IsValid ← {
   q ← (1‿3)⥊ π×𝕩 ⋄ l ← 1‿3 ⥊⟨0.5,0.5,0.5⟩
